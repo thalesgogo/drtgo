@@ -1,555 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DRT Go | Lightweight DRT Analysis Software</title>
-  <meta name="description" content="DRT Go is a lightweight DRT analysis tool for electrochemical impedance spectroscopy, designed for researchers and R&D teams." />
-  <style>
-    :root{
-      --bg:#f5f8f8;
-      --panel:#ffffff;
-      --panel-2:#f8fbfb;
-      --text:#1c2b2a;
-      --muted:#647875;
-      --line:#dbe8e5;
-      --brand:#0f8a82;
-      --brand-dark:#0a6761;
-      --brand-soft:#dff5f2;
-      --accent:#1f5c56;
-      --shadow:0 18px 50px rgba(12, 37, 35, 0.08);
-      --radius:20px;
-      --max:1180px;
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family: Inter, "Segoe UI", Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(15,138,130,.10), transparent 28%),
-        radial-gradient(circle at top right, rgba(15,138,130,.06), transparent 22%),
-        linear-gradient(180deg, #f8fbfb 0%, #f4f7f7 100%);
-      color:var(--text);
-    }
-    a{text-decoration:none;color:inherit}
-    img, video{max-width:100%;display:block}
-    .container{width:min(var(--max), calc(100% - 40px)); margin:0 auto}
-    .nav{
-      position:sticky; top:0; z-index:40;
-      backdrop-filter: blur(12px);
-      background: rgba(245,248,248,.78);
-      border-bottom:1px solid rgba(219,232,229,.8);
-    }
-    .nav-inner{
-      display:flex; align-items:center; justify-content:space-between;
-      min-height:72px; gap:20px;
-    }
-    .brand{
-      display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.02em;
-    }
-    .brand-mark{
-      width:40px; height:40px; border-radius:12px;
-      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-      display:grid; place-items:center; color:white; font-weight:900;
-      box-shadow:0 10px 24px rgba(15,138,130,.22);
-    }
-    .brand-copy small{
-      display:block; color:var(--muted); font-weight:600; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
-    }
-    .brand-copy span{display:block; font-size:20px}
-    .nav-links{
-      display:flex; gap:22px; align-items:center; color:var(--muted); font-size:14px; font-weight:600;
-    }
-    .nav-links a:hover{color:var(--brand)}
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      border:none; border-radius:999px; padding:14px 22px;
-      font-weight:700; font-size:14px; cursor:pointer;
-      transition:.2s ease;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn-primary{
-      background:linear-gradient(180deg, var(--brand), var(--brand-dark));
-      color:white; box-shadow:0 14px 34px rgba(15,138,130,.22);
-    }
-    .btn-secondary{
-      background:white; color:var(--accent); border:1px solid var(--line);
-      box-shadow:var(--shadow);
-    }
-    .hero{padding:64px 0 40px}
-    .hero-grid{
-      display:grid; grid-template-columns: 1.05fr .95fr; gap:34px; align-items:center;
-    }
-    .eyebrow{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:8px 14px; border-radius:999px; background:var(--brand-soft);
-      color:var(--accent); font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
-    }
-    h1{
-      margin:18px 0 16px;
-      font-size: clamp(38px, 6vw, 66px);
-      line-height:1.02;
-      letter-spacing:-0.04em;
-    }
-    .hero p{
-      font-size:18px; line-height:1.75; color:var(--muted); margin:0 0 24px;
-      max-width:680px;
-    }
-    .hero-actions{
-      display:flex; flex-wrap:wrap; gap:14px; align-items:center;
-      margin-bottom:24px;
-    }
-    .hero-meta{
-      display:flex; flex-wrap:wrap; gap:22px; color:var(--muted); font-size:14px;
-    }
-    .hero-meta strong{color:var(--text)}
-    .hero-visual{
-      position:relative;
-      padding:22px;
-      background:linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.96));
-      border:1px solid rgba(219,232,229,.9);
-      border-radius:28px;
-      box-shadow:0 24px 60px rgba(12,37,35,.10);
-      overflow:hidden;
-    }
-    .hero-visual::before{
-      content:"";
-      position:absolute; inset:auto -60px -60px auto;
-      width:180px; height:180px; border-radius:999px;
-      background:radial-gradient(circle, rgba(15,138,130,.16), transparent 70%);
-    }
-    .mock-browser{
-      border:1px solid var(--line); border-radius:18px; overflow:hidden; background:white;
-      box-shadow:0 16px 36px rgba(12,37,35,.08);
-    }
-    .mock-top{
-      height:40px; background:#f8fbfb; border-bottom:1px solid var(--line);
-      display:flex; align-items:center; gap:8px; padding:0 14px;
-    }
-    .dot{width:10px;height:10px;border-radius:50%;background:#cad9d6}
-    .mock-content{
-      padding:16px;
-      background:linear-gradient(180deg, #ffffff 0%, #fbfefe 100%);
-    }
-    .hero-image{
-      width:100%;
-      border-radius:14px;
-      border:1px solid var(--line);
-      box-shadow:0 16px 36px rgba(12,37,35,.08);
-    }
-    .section{padding:36px 0}
-    .section-head{
-      display:flex; align-items:end; justify-content:space-between; gap:18px; margin-bottom:22px;
-    }
-    .section-head h2{
-      margin:0; font-size: clamp(28px, 4vw, 42px); letter-spacing:-.03em;
-    }
-    .section-head p{
-      margin:10px 0 0; max-width:720px; color:var(--muted); line-height:1.75;
-    }
-    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:20px}
-    .grid-2{display:grid; grid-template-columns:repeat(2,1fr); gap:20px}
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(250,252,252,.98));
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:22px;
-      box-shadow:var(--shadow);
-    }
-    .card h3{margin:0 0 10px; font-size:20px}
-    .card p{margin:0; color:var(--muted); line-height:1.75}
-    .icon{
-      width:42px;height:42px;border-radius:12px; display:grid; place-items:center;
-      background:var(--brand-soft); color:var(--brand-dark); font-weight:900; margin-bottom:14px;
-    }
-    .video-card{padding:18px}
-    .demo-video{
-      width:100%;
-      border-radius:18px;
-      border:1px solid var(--line);
-      box-shadow:0 18px 40px rgba(12,37,35,.10);
-      background:#fff;
-    }
-    .visual-card{padding:16px}
-    .feature-image{
-      width:100%;
-      border-radius:14px;
-      border:1px solid var(--line);
-      box-shadow:0 12px 28px rgba(12,37,35,.08);
-    }
-    .caption{
-      padding:12px 6px 2px; color:var(--muted); font-size:14px; line-height:1.6;
-    }
-    .workflow{
-      display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
-    }
-    .step{
-      position:relative;
-      padding:22px;
-      background:white;
-      border:1px solid var(--line);
-      border-radius:18px;
-      box-shadow:var(--shadow);
-    }
-    .step-num{
-      width:34px;height:34px;border-radius:999px;
-      display:grid;place-items:center;
-      background:linear-gradient(180deg, var(--brand), var(--brand-dark));
-      color:#fff;font-size:13px;font-weight:800;
-      margin-bottom:14px;
-    }
-    .step h4{margin:0 0 10px;font-size:18px}
-    .step p{margin:0;color:var(--muted);line-height:1.65}
-    .pricing{
-      display:grid; grid-template-columns: 1.15fr .85fr; gap:22px; align-items:stretch;
-    }
-    .price-main{
-      padding:28px;
-      background:linear-gradient(135deg, #0f8a82, #0a6761);
-      color:white;
-      border-radius:26px;
-      box-shadow:0 24px 60px rgba(15,138,130,.22);
-    }
-    .price-main small{
-      display:inline-block; background:rgba(255,255,255,.14); padding:8px 12px; border-radius:999px;
-      letter-spacing:.08em; text-transform:uppercase; font-weight:800; font-size:12px;
-    }
-    .price-main h3{
-      margin:16px 0 8px; font-size:44px; letter-spacing:-.04em;
-    }
-    .price-main p{margin:0; color:rgba(255,255,255,.86); line-height:1.75}
-    .price-list{
-      margin:18px 0 24px; padding:0; list-style:none; display:grid; gap:10px;
-    }
-    .price-list li{
-      display:flex; gap:10px; align-items:flex-start; color:rgba(255,255,255,.95);
-    }
-    .price-list li::before{content:"✓"; font-weight:900}
-    .contact-list{display:grid; gap:14px; margin-top:6px}
-    .contact-row{
-      padding:15px 16px;
-      border:1px solid var(--line);
-      border-radius:16px;
-      background:var(--panel);
-      display:flex; justify-content:space-between; align-items:center; gap:16px;
-    }
-    .contact-row span{color:var(--muted); font-size:14px}
-    .contact-row strong{display:block; font-size:16px}
-    .notice{
-      margin-top:18px;
-      padding:16px 18px;
-      border:1px solid var(--line);
-      background:var(--panel-2);
-      border-radius:16px;
-      color:var(--muted);
-      line-height:1.7;
-      font-size:14px;
-    }
-    .footer{
-      padding:30px 0 50px;
-      color:var(--muted);
-    }
-    .footer-box{
-      border-top:1px solid var(--line);
-      padding-top:20px;
-      display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap;
-    }
-    .tag{
-      display:inline-flex; align-items:center; padding:8px 12px; border-radius:999px;
-      background:#fff; border:1px solid var(--line); color:var(--muted); font-size:13px; font-weight:700;
-    }
-    @media (max-width: 980px){
-      .hero-grid,.pricing,.grid-3,.grid-2,.workflow{grid-template-columns:1fr}
-      .nav-links{display:none}
-      .hero{padding-top:40px}
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRT Go</title>
+
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#f5f8f8;
+}
+
+.container{
+  width:90%;
+  max-width:1200px;
+  margin:auto;
+}
+
+.section{
+  margin-top:60px;
+}
+
+.demo-video{
+  width:100%;
+  border-radius:20px;
+  border:1px solid #ddd;
+  aspect-ratio:16/9;
+  object-fit:cover;
+}
+
+/* contact */
+.contact-row{
+  padding:15px;
+  border:1px solid #ddd;
+  margin-bottom:10px;
+  border-radius:10px;
+}
+</style>
 </head>
+
 <body>
-  <header class="nav">
-    <div class="container nav-inner">
-      <a href="#top" class="brand">
-        <div class="brand-mark">D</div>
-        <div class="brand-copy">
-          <small>Electrochemical Analytics</small>
-          <span>DRT Go</span>
-        </div>
-      </a>
-      <nav class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#video-demo">Video</a>
-        <a href="#visuals">Visuals</a>
-        <a href="#workflow">Workflow</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#contact">Contact</a>
-      </nav>
-      <a class="btn btn-primary" href="#contact">Request Trial</a>
-    </div>
-  </header>
 
-  <main id="top">
-    <section class="hero">
-      <div class="container hero-grid">
-        <div>
-          <div class="eyebrow">DRT analysis for EIS researchers</div>
-          <h1>Lightweight DRT analysis, built for real electrochemical work.</h1>
-          <p>
-            DRT Go is a focused software tool for electrochemical impedance spectroscopy,
-            designed for universities, research institutes, and industrial R&D teams.
-            It combines reference-level analytical rigor with a practical workflow for
-            batch analysis, visualization, and export.
-          </p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#contact">Request Trial</a>
-            <a class="btn btn-secondary" href="#visuals">View Visuals</a>
-          </div>
-          <div class="hero-meta">
-            <div><strong>No Python / MATLAB</strong><br>Install and run directly</div>
-            <div><strong>Animation export</strong><br>Series and MP4 workflow</div>
-            <div><strong>Academic tone</strong><br>Built for research use</div>
-          </div>
-        </div>
+<div class="container">
 
-        <div class="hero-visual">
-          <div class="mock-browser">
-            <div class="mock-top">
-              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            </div>
-            <div class="mock-content">
-              <img src="hero0421.png" alt="DRT Go interface" class="hero-image">
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+<!-- 视频 -->
+<div class="section">
+  <h2>See DRT evolution in motion.</h2>
 
-    <section class="section" id="features">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <span class="tag">Core strengths</span>
-            <h2>Focused software, not a bloated platform.</h2>
-            <p>
-              DRT Go is intentionally compact. It is designed to make high-quality DRT
-              analysis accessible without requiring scripting environments or complex workflows,
-              while keeping the visual and export experience strong enough for real project use.
-            </p>
-          </div>
-        </div>
+  <video class="demo-video" autoplay muted loop playsinline preload="auto">
+    <source src="demo_video.mp4" type="video/mp4">
+  </video>
+</div>
 
-        <div class="grid-3">
-          <div class="card">
-            <div class="icon">λ</div>
-            <h3>Rigorous DRT workflow</h3>
-            <p>
-              Supports established regularization strategies and practical settings for
-              electrochemical impedance interpretation across research scenarios.
-            </p>
-          </div>
-          <div class="card">
-            <div class="icon">↺</div>
-            <h3>Batch and remote processing</h3>
-            <p>
-              Built to handle repeated datasets efficiently, including automated remote workflows
-              and improved compatibility with incoming data formats.
-            </p>
-          </div>
-          <div class="card">
-            <div class="icon">▶</div>
-            <h3>Publication-ready visuals</h3>
-            <p>
-              Export image sequences and MP4 animations with synchronized Var and profile context,
-              giving a clear view of how DRT evolves across a series.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
+<!-- 联系 -->
+<div class="section">
+  <h2>Contact & Trial</h2>
 
-    <section class="section" id="video-demo">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <span class="tag">Dynamic visualization</span>
-            <h2>See DRT evolution in motion.</h2>
-            <p>
-              Sweep preview and MP4 export allow intuitive understanding of
-              electrochemical process evolution.
-            </p>
-          </div>
-        </div>
+  <div class="contact-row">
+    <b>Email</b><br>
+    drtgo-software@outlook.com
+  </div>
 
-        <div class="card video-card">
-          <video class="demo-video" autoplay muted loop playsinline controls>
-            <source src="demo_video.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      </div>
-    </section>
+  <div class="contact-row">
+    <b>Trial download</b><br>
+    <a href="https://share.weiyun.com/FJrQA7z9" target="_blank">
+      Download via Tencent Weiyun
+    </a>
+  </div>
 
-    <section class="section" id="visuals">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <span class="tag">Representative outputs</span>
-            <h2>From impedance to interpretation.</h2>
-            <p>
-              DRT Go combines direct electrochemical insight with practical visualization,
-              from raw EIS reproduction to DRT plots and contour evolution.
-            </p>
-          </div>
-        </div>
+  <div style="color:gray;margin-top:10px;">
+    If download is slow, please contact via email.
+  </div>
+</div>
 
-        <div class="grid-3">
-          <div class="card visual-card">
-            <img src="eis_reproduction.png" alt="EIS and reproduction" class="feature-image">
-            <div class="caption">
-              <strong>EIS &amp; reproduction</strong><br>
-              Comparison between measured and reconstructed impedance.
-            </div>
-          </div>
+</div>
 
-          <div class="card visual-card">
-            <img src="drt_plots.png" alt="DRT plots" class="feature-image">
-            <div class="caption">
-              <strong>DRT plots</strong><br>
-              Distribution of relaxation times across datasets.
-            </div>
-          </div>
-
-          <div class="card visual-card">
-            <img src="contour.png" alt="Contour plot" class="feature-image">
-            <div class="caption">
-              <strong>Contour</strong><br>
-              Evolution of DRT features across experimental conditions.
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="workflow">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <span class="tag">Practical workflow</span>
-            <h2>Simple from import to presentation.</h2>
-          </div>
-        </div>
-
-        <div class="workflow">
-          <div class="step">
-            <div class="step-num">01</div>
-            <h4>Import EIS data</h4>
-            <p>Support common text-based files and define Var manually when needed.</p>
-          </div>
-          <div class="step">
-            <div class="step-num">02</div>
-            <h4>Compute DRT</h4>
-            <p>Use a focused interface for parameter setup, visualization, and comparison.</p>
-          </div>
-          <div class="step">
-            <div class="step-num">03</div>
-            <h4>Preview evolution</h4>
-            <p>Inspect changing DRT behavior through sweep playback and profile-linked context.</p>
-          </div>
-          <div class="step">
-            <div class="step-num">04</div>
-            <h4>Export for communication</h4>
-            <p>Generate static images, image series, or MP4 videos for talks, reports, and internal sharing.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="pricing">
-      <div class="container pricing">
-        <div class="price-main">
-          <small>Commercial availability</small>
-          <h3>Flexible pricing for research and industry</h3>
-          <p>
-            DRT Go is designed for both academic and industrial users,
-            with pricing tailored to different application scenarios.
-            Please contact for details and trial access.
-          </p>
-          <ul class="price-list">
-            <li>Permanent license</li>
-            <li>Free updates within the current development roadmap</li>
-            <li>Direct communication for pre-sales and technical discussion</li>
-            <li>Suitable for universities, research institutes, and industrial R&D</li>
-          </ul>
-          <a class="btn btn-secondary" href="#contact">Discuss purchase</a>
-        </div>
-
-        <div class="card" id="contact">
-          <h3>Contact & trial</h3>
-          <p style="color:var(--muted); line-height:1.75; margin:0 0 18px;">
-            For trial access, quotations, purchasing workflow, or lecture collaboration,
-            please contact directly. This is currently the fastest path for serious users.
-          </p>
-
-          <div class="contact-list">
-            <div class="contact-row">
-              <div>
-                <span>Email</span>
-                <strong>drtgo-software@outlook.com</strong>
-              </div>
-            </div>
-            <div class="contact-row">
-              <div>
-                <span>WeChat</span>
-                <strong>Replace with your WeChat ID</strong>
-              </div>
-            </div>
-            <div class="contact-row">
-              <div>
-                <span>Download</span>
-                <strong>Replace with trial download link</strong>
-              </div>
-            </div>
-          </div>
-
-          <div class="notice">
-            For customers in mainland China, if website access or download speed is limited,
-            trial files and installation support can also be provided directly through email or WeChat.
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container grid-2">
-        <div class="card">
-          <h3>Target users</h3>
-          <p>
-            DRT Go is intended for electrochemical researchers and R&D engineers working in
-            batteries, fuel cells, electrolysis, corrosion, and related fields where impedance data
-            must be interpreted clearly and communicated efficiently.
-          </p>
-        </div>
-        <div class="card">
-          <h3>Lectures & technical communication</h3>
-          <p>
-            The software can also be introduced through lectures, internal seminars, and application-oriented
-            discussions. For institutions interested in a focused EIS–DRT session, please get in touch directly.
-          </p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="container footer-box">
-      <div>
-        <strong>DRT Go</strong><br>
-        <span>Electrochemical impedance analysis with a focused DRT workflow.</span>
-      </div>
-      <div>
-        <span>© 2026 Lei Tao. All rights reserved.</span>
-      </div>
-    </div>
-  </footer>
 </body>
 </html>
